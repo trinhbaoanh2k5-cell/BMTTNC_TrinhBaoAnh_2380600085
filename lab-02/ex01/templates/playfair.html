@@ -7,24 +7,26 @@
 </head>
 <body class="container mt-5">
     <h2 class="text-center mb-4">PLAYFAIR CIPHER</h2>
-    
     <div class="card mb-4 border-primary shadow-sm">
         <div class="card-header bg-primary text-white font-weight-bold">ENCRYPTION</div>
         <div class="card-body">
             <form method="POST" action="/playfair/encrypt">
-                <div class="form-group"><label>Plain text:</label><input type="text" name="inputPlainText" class="form-control" required></div>
-                <div class="form-group"><label>Key (String):</label><input type="text" name="inputKey" class="form-control" required></div>
+                <div class="form-group"><label>Plain text:</label>
+                    <input type="text" name="inputPlainText" class="form-control" required></div>
+                <div class="form-group"><label>Key (String):</label>
+                    <input type="text" name="inputKey" class="form-control" required></div>
                 <button type="submit" class="btn btn-primary">Encrypt</button>
             </form>
         </div>
     </div>
-
     <div class="card border-success shadow-sm">
         <div class="card-header bg-success text-white font-weight-bold">DECRYPTION</div>
         <div class="card-body">
             <form method="POST" action="/playfair/decrypt">
-                <div class="form-group"><label>Cipher text:</label><input type="text" name="inputCipherText" class="form-control" required></div>
-                <div class="form-group"><label>Key (String):</label><input type="text" name="inputKey" class="form-control" required></div>
+                <div class="form-group"><label>Cipher text:</label>
+                    <input type="text" name="inputCipherText" class="form-control" required></div>
+                <div class="form-group"><label>Key (String):</label>
+                    <input type="text" name="inputKey" class="form-control" required></div>
                 <button type="submit" class="btn btn-success">Decrypt</button>
             </form>
         </div>

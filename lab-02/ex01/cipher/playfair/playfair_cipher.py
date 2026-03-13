@@ -2,66 +2,81 @@ class PlayfairCipher:
     def __init__(self):
         pass
 
-    def __create_matrix(self, key):
-        key = key.upper().replace('J', 'I')
-        matrix = []
-        for char in key:
-            if char not in matrix and char.isalpha():
-                matrix.append(char)
+    # 1. Hàm tạo ma trận 5x5 từ Key
+    def generate_matrix(self, key):
+        key = key.upper().replace('J', 'I').replace(" ", "")
         alphabet = "ABCDEFGHIKLMNOPQRSTUVWXYZ"
+        matrix_flat = []
+        used_chars = set()
+        
+        for char in key:
+            if char not in used_chars and char in alphabet:
+                matrix_flat.append(char)
+                used_chars.add(char)
+                
         for char in alphabet:
-            if char not in matrix:
-                matrix.append(char)
-        return [matrix[i:i+5] for i in range(0, 25, 5)]
+            if char not in used_chars:
+                matrix_flat.append(char)
+                used_chars.add(char)
+                
+        return [matrix_flat[i:i+5] for i in range(0, 25, 5)]
 
-    def __find_position(self, matrix, char):
+    # 2. Hàm tìm vị trí hàng và cột của một ký tự
+    def find_position(self, matrix, char):
         for r, row in enumerate(matrix):
             if char in row:
                 return r, row.index(char)
         return None
 
-    def __prepare_text(self, text):
-        text = text.upper().replace('J', 'I').replace(" ", "")
+    # 3. Hàm Mã hóa (Encrypt)
+    def playfair_encrypt(self, plain_text, key):
+        matrix = self.generate_matrix(key)
+        plain_text = plain_text.upper().replace('J', 'I').replace(" ", "")
+        
+        # Xử lý cặp ký tự (thêm X nếu trùng hoặc lẻ)
         prepared_text = ""
         i = 0
-        while i < len(text):
-            prepared_text += text[i]
-            if i + 1 < len(text):
-                if text[i] == text[i+1]:
-                    prepared_text += 'X'
-                else:
-                    prepared_text += text[i+1]
+        while i < len(plain_text):
+            a = plain_text[i]
+            if (i + 1) < len(plain_text):
+                b = plain_text[i+1]
+                if a == b:
+                    prepared_text += a + 'X'
                     i += 1
+                else:
+                    prepared_text += a + b
+                    i += 2
             else:
-                prepared_text += 'X'
-            i += 1
-        return prepared_text
-
-    def playfair_encrypt(self, plain_text, key):
-        matrix = self.__create_matrix(key)
-        prepared_text = self.__prepare_text(plain_text)
-        ciphertext = ""
+                prepared_text += a + 'X'
+                i += 1
+        
+        cipher_text = ""
         for i in range(0, len(prepared_text), 2):
-            r1, c1 = self.__find_position(matrix, prepared_text[i])
-            r2, c2 = self.__find_position(matrix, prepared_text[i+1])
-            if r1 == r2:
-                ciphertext += matrix[r1][(c1 + 1) % 5] + matrix[r2][(c2 + 1) % 5]
-            elif c1 == c2:
-                ciphertext += matrix[(r1 + 1) % 5][c1] + matrix[(r2 + 1) % 5][c2]
-            else:
-                ciphertext += matrix[r1][c2] + matrix[r2][c1]
-        return ciphertext
+            row1, col1 = self.find_position(matrix, prepared_text[i])
+            row2, col2 = self.find_position(matrix, prepared_text[i+1])
+            
+            if row1 == row2: # Cùng hàng
+                cipher_text += matrix[row1][(col1 + 1) % 5] + matrix[row2][(col2 + 1) % 5]
+            elif col1 == col2: # Cùng cột
+                cipher_text += matrix[(row1 + 1) % 5][col1] + matrix[(row2 + 1) % 5][col2]
+            else: # Hình chữ nhật
+                cipher_text += matrix[row1][col2] + matrix[row2][col1]
+        return cipher_text
 
+    # 4. Hàm Giải mã (Decrypt)
     def playfair_decrypt(self, cipher_text, key):
-        matrix = self.__create_matrix(key)
-        decrypted_text = ""
+        matrix = self.generate_matrix(key)
+        cipher_text = cipher_text.upper().replace(" ", "")
+        
+        plain_text = ""
         for i in range(0, len(cipher_text), 2):
-            r1, c1 = self.__find_position(matrix, cipher_text[i])
-            r2, c2 = self.__find_position(matrix, cipher_text[i+1])
-            if r1 == r2:
-                decrypted_text += matrix[r1][(c1 - 1) % 5] + matrix[r2][(c2 - 1) % 5]
-            elif c1 == c2:
-                decrypted_text += matrix[(r1 - 1) % 5][c1] + matrix[(r2 - 1) % 5][c2]
+            row1, col1 = self.find_position(matrix, cipher_text[i])
+            row2, col2 = self.find_position(matrix, cipher_text[i+1])
+            
+            if row1 == row2:
+                plain_text += matrix[row1][(col1 - 1) % 5] + matrix[row2][(col2 - 1) % 5]
+            elif col1 == col2:
+                plain_text += matrix[(row1 - 1) % 5][col1] + matrix[(row2 - 1) % 5][col2]
             else:
-                decrypted_text += matrix[r1][c2] + matrix[r2][c1]
-        return decrypted_text
+                plain_text += matrix[row1][col2] + matrix[row2][col1]
+        return plain_text
