@@ -1,9 +1,17 @@
 from flask import Flask, request, jsonify
 from cipher.caesar.caesar_cipher import CaesarCipher
 from cipher.vigenere import VigenereCipher
+# Thêm import cho Rail Fence
+from cipher.railfence import RailFenceCipher
+
 app = Flask(__name__)
+
+# Khởi tạo các thuật toán
 caesar = CaesarCipher()
 vigenere_cipher = VigenereCipher()
+rail_fence_cipher = RailFenceCipher()
+
+# --- CAESAR CIPHER ROUTES ---
 @app.route("/api/caesar/encrypt", methods=["POST"])
 def encrypt():
     data = request.json
@@ -13,13 +21,13 @@ def encrypt():
 def decrypt():
     data = request.json
     return jsonify({'decrypted_message': caesar.decrypt_text(data['cipher_text'], int(data['key']))})
-# VIGENERE CIPHER ALGORITHM
+
+# --- VIGENERE CIPHER ROUTES ---
 @app.route('/api/vigenere/encrypt', methods=['POST'])
 def vigenere_encrypt():
     data = request.json
     plain_text = data['plain_text']
     key = data['key']
-    # Gọi hàm mã hóa Vigenere
     encrypted_text = vigenere_cipher.vigenere_encrypt(plain_text, key)
     return jsonify({'encrypted_text': encrypted_text})
 
@@ -28,8 +36,25 @@ def vigenere_decrypt():
     data = request.json
     cipher_text = data['cipher_text']
     key = data['key']
-    # Gọi hàm giải mã Vigenere
     decrypted_text = vigenere_cipher.vigenere_decrypt(cipher_text, key)
     return jsonify({'decrypted_text': decrypted_text})
+
+# --- RAIL FENCE CIPHER ROUTES ---
+@app.route('/api/railfence/encrypt', methods=['POST'])
+def railfence_encrypt():
+    data = request.json
+    plain_text = data['plain_text']
+    num_rails = int(data['num_rails'])
+    encrypted_text = rail_fence_cipher.rail_fence_encrypt(plain_text, num_rails)
+    return jsonify({'encrypted_text': encrypted_text})
+
+@app.route('/api/railfence/decrypt', methods=['POST'])
+def railfence_decrypt():
+    data = request.json
+    cipher_text = data['cipher_text']
+    num_rails = int(data['num_rails'])
+    decrypted_text = rail_fence_cipher.rail_fence_decrypt(cipher_text, num_rails)
+    return jsonify({'decrypted_text': decrypted_text})
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
