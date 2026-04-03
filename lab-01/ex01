@@ -1,0 +1,7 @@
+# Nhập tên và tuổi từ người dùng
+ten = input("Nhập tên của bạn: ")
+tuoi = input("Nhập tuổi của bạn: ")
+
+# In thông điệp chào mừng
+# Sử dụng f-string để câu văn liền mạch hơn
+print(f"Chào mừng {ten}! Bạn {tuoi} tuổi.")
